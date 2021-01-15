@@ -46,20 +46,18 @@ public class CategoryResource {
             .toUri();
 
     response.setHeader( "Location", uri.toASCIIString() );
-
     return ResponseEntity.created( uri ).body( savedCategory );
   }
 
-    @GetMapping( "/{id}" )
-    @ApiOperation( "Search for a category using an id" )
-    @ApiResponses( value = {
-            @ApiResponse( code = 200, message = "Category found" ),
-            @ApiResponse( code = 404, message = "Category not found" )
-    } )
-    public ResponseEntity< Optional< Category > > findCategoryById( @PathVariable( "id" ) Long id ) /*throws Exception*/ {
-      /*if(!categoryRepository.findById( id ).isPresent()){
-        throw new Exception();
-      }*/
-      return ResponseEntity.ok( categoryRepository.findById( id ) );
-    }
+  @GetMapping( "/{id}" )
+  @ApiOperation( "Search for a category using an id" )
+  @ApiResponses( value = {
+          @ApiResponse( code = 200, message = "Category found" ),
+          @ApiResponse( code = 404, message = "Category not found" )
+  } )
+  public ResponseEntity< Optional< Category > > findCategoryById( @PathVariable( "id" ) Long id ) {
+    Optional category = categoryRepository.findById( id );
+
+    return category.isPresent() ? ResponseEntity.ok( category ) : ResponseEntity.notFound().build();
+  }
 }
