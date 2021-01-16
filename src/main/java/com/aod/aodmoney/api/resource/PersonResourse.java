@@ -1,18 +1,19 @@
 package com.aod.aodmoney.api.resource;
 
+import com.aod.aodmoney.api.event.ResourceCreatedEvent;
 import com.aod.aodmoney.api.model.Person;
 import com.aod.aodmoney.api.repository.PersonRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.Optional;
 
 @RestController
@@ -21,20 +22,17 @@ public class PersonResourse {
   @Autowired
   private PersonRepository personRepository;
 
+  @Autowired
+  private ApplicationEventPublisher publisher;
+
   @PostMapping
   @ApiOperation( "Add a new person" )
   @ApiResponses( value = { @ApiResponse( code = 201, message = "Person added" ) } )
   public ResponseEntity< Person > create( @Valid @RequestBody Person person, HttpServletResponse response ) {
     Person savedPerson = personRepository.save( person );
 
-    URI uri = ServletUriComponentsBuilder
-            .fromCurrentRequestUri()
-            .path( "/{id}" )
-            .buildAndExpand( savedPerson.getId() )
-            .toUri();
-
-    response.setHeader( "Location", uri.toASCIIString() );
-    return ResponseEntity.created( uri ).body( savedPerson );
+    publisher.publishEvent( new ResourceCreatedEvent( this, response, person.getId() ) );
+    return ResponseEntity.status( HttpStatus.CREATED ).body( savedPerson );
   }
 
   @GetMapping( "/{id}" )
