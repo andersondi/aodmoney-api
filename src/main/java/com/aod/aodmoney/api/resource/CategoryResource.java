@@ -5,9 +5,7 @@ import com.aod.aodmoney.api.repository.CategoryRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -33,7 +31,6 @@ public class CategoryResource {
   }
 
   @PostMapping
-//  @ResponseStatus( HttpStatus.CREATED) This annotation is not necessary because the operation was defined by the RequestBody return
   @ApiOperation( "Add a new category" )
   @ApiResponses( value = { @ApiResponse( code = 201, message = "Category added" ) } )
   public ResponseEntity< Category > create( @Valid @RequestBody Category category, HttpServletResponse response ) {
