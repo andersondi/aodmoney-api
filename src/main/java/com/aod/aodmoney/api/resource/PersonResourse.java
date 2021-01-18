@@ -46,4 +46,12 @@ public class PersonResourse {
 
     return person.isPresent() ? ResponseEntity.ok( person ) : ResponseEntity.notFound().build();
   }
+
+  @DeleteMapping( "/{id}" )
+  @ApiOperation( "Delete a person by id" )
+  @ApiResponses( value = { @ApiResponse( code = 204, message = "Person deleted with success" ) } )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete( @PathVariable( "id" ) Long id ) {
+    personRepository.deleteById( id );
+  }
 }
