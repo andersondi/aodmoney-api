@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @ControllerAdvice
 public class AodMoneyResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
@@ -30,20 +32,22 @@ public class AodMoneyResponseEntityExceptionHandler extends ResponseEntityExcept
   protected ResponseEntity< Object > handleHttpMessageNotReadable( HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request ) {
 
     String userMessage = messageSource.getMessage( "message.invalid-types", null, LocaleContextHolder.getLocale() );
-    String developerMessage = ex.getCause().toString();
+    String developerMessage = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
+
     List< Error > errors = Arrays.asList( new Error( userMessage, developerMessage ) );
 
     return handleExceptionInternal( ex, errors, headers, HttpStatus.BAD_REQUEST, request );
   }
 
-  @ExceptionHandler( EmptyResultDataAccessException.class)
-  public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request){
+  @ExceptionHandler( EmptyResultDataAccessException.class )
+  public ResponseEntity< Object > handleEmptyResultDataAccessException( EmptyResultDataAccessException ex, WebRequest request ) {
     String userMessage = messageSource.getMessage( "message.missed-data", null, LocaleContextHolder.getLocale() );
     String developerMessage = ex.toString();
     List< Error > errors = Arrays.asList( new Error( userMessage, developerMessage ) );
 
-    return handleExceptionInternal( ex, errors, new HttpHeaders(  ), HttpStatus.NOT_FOUND, request );
+    return handleExceptionInternal( ex, errors, new HttpHeaders(), HttpStatus.NOT_FOUND, request );
   }
+
   @Override
   protected ResponseEntity< Object > handleMethodArgumentNotValid( MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request ) {
 

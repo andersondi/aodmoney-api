@@ -3,6 +3,7 @@ package com.aod.aodmoney.api.resource;
 import com.aod.aodmoney.api.event.ResourceCreatedEvent;
 import com.aod.aodmoney.api.model.Person;
 import com.aod.aodmoney.api.repository.PersonRepository;
+import com.aod.aodmoney.api.service.PersonService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -21,6 +22,9 @@ import java.util.Optional;
 public class PersonResourse {
   @Autowired
   private PersonRepository personRepository;
+
+  @Autowired
+  private PersonService personService;
 
   @Autowired
   private ApplicationEventPublisher publisher;
@@ -50,8 +54,24 @@ public class PersonResourse {
   @DeleteMapping( "/{id}" )
   @ApiOperation( "Delete a person by id" )
   @ApiResponses( value = { @ApiResponse( code = 204, message = "Person deleted with success" ) } )
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus( HttpStatus.NO_CONTENT )
   public void delete( @PathVariable( "id" ) Long id ) {
     personRepository.deleteById( id );
+  }
+
+  @PutMapping( "/{id}" )
+  @ApiOperation( "Update an entire person by id" )
+  @ApiResponses( value = { @ApiResponse( code = 200, message = "Person updated with success" ) } )
+  public ResponseEntity< Person > update( @PathVariable Long id, @Valid @RequestBody Person person ) {
+    Person updatedPerson = personService.update( id, person );
+    return ResponseEntity.ok( updatedPerson );
+  }
+
+  @PutMapping( "/{id}/active" )
+  @ApiOperation( "Update the active status to a person" )
+  @ApiResponses( value = { @ApiResponse( code = 204, message = "Person active status updated with success" ) } )
+  @ResponseStatus( HttpStatus.NO_CONTENT )
+  public void updateActiveStatus( @PathVariable Long id, @RequestBody Boolean activeStatus ) {
+    personService.updateActiveStatus( id, activeStatus );
   }
 }
