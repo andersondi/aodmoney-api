@@ -2,7 +2,6 @@ package com.aod.aodmoney.api.resource;
 
 import com.aod.aodmoney.api.event.ResourceCreatedEvent;
 import com.aod.aodmoney.api.model.Person;
-import com.aod.aodmoney.api.repository.PersonRepository;
 import com.aod.aodmoney.api.service.PersonService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -20,8 +19,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping( "/persons" )
 public class PersonResourse {
-  @Autowired
-  private PersonRepository personRepository;
 
   @Autowired
   private PersonService personService;
@@ -33,7 +30,7 @@ public class PersonResourse {
   @ApiOperation( "Add a new person" )
   @ApiResponses( value = { @ApiResponse( code = 201, message = "Person added" ) } )
   public ResponseEntity< Person > create( @Valid @RequestBody Person person, HttpServletResponse response ) {
-    Person savedPerson = personRepository.save( person );
+    Person savedPerson = personService.save( person );
 
     publisher.publishEvent( new ResourceCreatedEvent( this, response, person.getId() ) );
     return ResponseEntity.status( HttpStatus.CREATED ).body( savedPerson );
@@ -46,7 +43,7 @@ public class PersonResourse {
           @ApiResponse( code = 404, message = "Person not found" )
   } )
   public ResponseEntity< Optional< Person > > findPersonById( @PathVariable( "id" ) Long id ) {
-    Optional person = personRepository.findById( id );
+    Optional person = personService.findById( id );
 
     return person.isPresent() ? ResponseEntity.ok( person ) : ResponseEntity.notFound().build();
   }
@@ -56,14 +53,14 @@ public class PersonResourse {
   @ApiResponses( value = { @ApiResponse( code = 204, message = "Person deleted with success" ) } )
   @ResponseStatus( HttpStatus.NO_CONTENT )
   public void delete( @PathVariable( "id" ) Long id ) {
-    personRepository.deleteById( id );
+    personService.deleteById( id );
   }
 
   @PutMapping( "/{id}" )
   @ApiOperation( "Update an entire person by id" )
   @ApiResponses( value = { @ApiResponse( code = 200, message = "Person updated with success" ) } )
   public ResponseEntity< Person > update( @PathVariable Long id, @Valid @RequestBody Person person ) {
-    Person updatedPerson = personService.update( id, person );
+    Person updatedPerson = personService.updateById( id, person );
     return ResponseEntity.ok( updatedPerson );
   }
 

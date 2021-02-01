@@ -50,7 +50,7 @@ public class CategoryResource {
           @ApiResponse( code = 200, message = "Category found" ),
           @ApiResponse( code = 404, message = "Category not found" )
   } )
-  public ResponseEntity< Optional< Category > > findCategoryById( @PathVariable( "id" ) Long id ) {
+  public ResponseEntity< Optional< Category > > findById( @PathVariable( "id" ) Long id ) {
     Optional category = categoryRepository.findById( id );
 
     return category.isPresent() ? ResponseEntity.ok( category ) : ResponseEntity.notFound().build();
